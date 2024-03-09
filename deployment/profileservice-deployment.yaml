@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-hs-mern-himani
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend-hs-mern-himani
+  template:
+    metadata:
+      labels:
+        app: backend-hs-mern-himani
+    spec:
+      containers:
+      - name: profile-microservice
+        image: us-central1-docker.pkg.dev/graphic-parsec-413206/profileservice/profile:latest
+        ports:
+        - containerPort: 3002
+        env:
+        - name: MONGO_URL
+          valueFrom:
+            secretKeyRef:
+              name: mongo-secret
+              key: MONGO_URL
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: profileservice-be-service
+spec:
+  selector:
+    app: backend-hs-mern-himani
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3002
+  type: LoadBalancer
